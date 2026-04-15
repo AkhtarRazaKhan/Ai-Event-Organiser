@@ -29,6 +29,10 @@ export const createEvent = mutation({
     try {
       const user = await ctx.runQuery(internal.users.getCurrentUser);
 
+        if (!user) {
+          throw new Error("User not authenticated");
+        }
+
       // SERVER-SIDE CHECK: Verify event limit for Free users
       if (!hasPro && user.freeEventsCreated >= 1) {
         throw new Error(
@@ -93,7 +97,11 @@ export const getEventBySlug = query({
 // Get events by organizer
 export const getMyEvents = query({
   handler: async (ctx) => {
-    const user = await ctx.runQuery(internal.users.getCurrentUser);
+   const user = await ctx.runQuery(internal.users.getCurrentUser);
+
+        if (!user) {
+          throw new Error("User not authenticated");
+        }
 
     const events = await ctx.db
       .query("events")
@@ -109,7 +117,11 @@ export const getMyEvents = query({
 export const deleteEvent = mutation({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    const user = await ctx.runQuery(internal.users.getCurrentUser);
+   const user = await ctx.runQuery(internal.users.getCurrentUser);
+
+        if (!user) {
+          throw new Error("User not authenticated");
+        }
 
     const event = await ctx.db.get(args.eventId);
     if (!event) {
