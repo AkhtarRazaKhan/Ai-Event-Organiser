@@ -23,33 +23,20 @@ export const createEvent = mutation({
     ticketPrice: v.optional(v.number()),
     coverImage: v.optional(v.string()),
     themeColor: v.optional(v.string()),
-    hasPro: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     try {
+      // const user = await ctx.runQuery(internal.users.getCurrentUser);
+
       const user = await ctx.runQuery(internal.users.getCurrentUser);
 
         if (!user) {
           throw new Error("User not authenticated");
         }
 
-      // SERVER-SIDE CHECK: Verify event limit for Free users
-      if (!hasPro && user.freeEventsCreated >= 1) {
-        throw new Error(
-          "Free event limit reached. Please upgrade to Pro to create more events."
-        );
-      }
-
-      // SERVER-SIDE CHECK: Verify custom color usage
-      const defaultColor = "#1e3a8a";
-      if (!hasPro && args.themeColor && args.themeColor !== defaultColor) {
-        throw new Error(
-          "Custom theme colors are a Pro feature. Please upgrade to Pro."
-        );
-      }
 
       // Force default color for Free users
-      const themeColor = hasPro ? args.themeColor : defaultColor;
+      const themeColor = args.themeColor;
 
       // Generate slug from title
       const slug = args.title
@@ -97,11 +84,12 @@ export const getEventBySlug = query({
 // Get events by organizer
 export const getMyEvents = query({
   handler: async (ctx) => {
-   const user = await ctx.runQuery(internal.users.getCurrentUser);
+    //Check logged in user
+    const user = await ctx.runQuery(internal.users.getCurrentUser);
 
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
 
     const events = await ctx.db
       .query("events")
@@ -117,11 +105,11 @@ export const getMyEvents = query({
 export const deleteEvent = mutation({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-   const user = await ctx.runQuery(internal.users.getCurrentUser);
+    const user = await ctx.runQuery(internal.users.getCurrentUser);
 
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
 
     const event = await ctx.db.get(args.eventId);
     if (!event) {
