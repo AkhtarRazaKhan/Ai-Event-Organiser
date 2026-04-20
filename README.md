@@ -1,6 +1,6 @@
 # Full Stack AI Event Organiser with Next JS, Tailwind, Mobbin, Shadcn UI Tutorial 🔥🔥
 
-### Make sure to create a `.env` file with following variables -
+# Make sure to create a `.env` file with following variables -
 
 ```
 # Deployment used by `npx convex dev`
